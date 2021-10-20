@@ -1,17 +1,56 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <h1 v-html="this.question"></h1>
+    <!-- <h1>{{this.question}}</h1> -->
+
+    
+    <input type="radio" name="options" value="True">
+    <label>True</label>
+    <br>
+    <input type="radio" name="options" value="False">
+    <label>False</label>
+    <br>
+    <button class="send" type="button">Send</button>
+
+
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+
+  data() {
+    return {
+      question: undefined,
+      incorrectAnswers: undefined,
+      correctAnswer: undefined,
+    }
+  },
+
+  // computed properties
+  computed: {
+    answers() {
+      let answers = JSON.parse(JSON.stringify(this.incorrectAnswers));
+        // shuffle an array
+      answers.splice( Math.round(Math.random() * answers.length), 0, this.correctAnswer);
+      // answers.push(this.correctAnswer);
+      return answers;
+    }
+  },
+  
+  created() {
+    this.axios.get("https://opentdb.com/api.php?amount=1&category=18&difficulty=easy")
+    .then((response) => {
+      this.question = response.data.results[0].question,
+      this.incorrectAnswers = response.data.results[0].incorrect_answers,
+      this.correctAnswer = response.data.results[0].correct_answer
+      })
   }
 }
+
+// https://opentdb.com/api.php?amount=1&category=18&difficulty=easy
 </script>
 
 <style lang="scss">
@@ -21,6 +60,22 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin: 60px auto;
+  max-width: 960px;
+
+  input[type=radio] {
+    margin: 12px 4px;
+  }
+
+  button.send {
+    margin-top: 12px;
+    height: 40px;
+    min-width: 120px;
+    padding: 0 16px;
+    color: #fff;
+    background-color: #1867c0;
+    border: 1px solid #1867c0;
+    cursor: pointer;
+}
 }
 </style>
